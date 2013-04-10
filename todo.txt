@@ -1,0 +1,116 @@
+
+Connect color editor to setColor(N,N,N) in code:
+  -- Double clicking within "setColor(N,N,N)" should
+     highlight the N,N,N and bring up the color editor.
+  -- Changes to the color sliders should continually
+     update the text of the code, forcing a reparse
+     with every update.
+  -- Remember that the new overlayRegion needs to 
+     be made visible through every parse.
+
+After the above, go on to implement a curve editor widget.
+
+cmd-z (undo) should work for both client views!!!
+
+Add option to print error messages.
+
+Add ESCAPE and QUIT to menu.
+
+If creating Image, then need to layout all
+Blocks as if they are open.  Then piece them
+together when it's time to render.
+
+Try rendering each top-level child of Doc into a bit-map image.
+  -- this allows scrolling become super-fast.
+  -- makes it easy to have miniature "previews" of inner blocks/images.
+
+Mouse-over preview modes for "peeking into" blocks.
+
+In general -- light-weight exploring "what's in here" with the mouse.
+
+"This is what will happen when the mouse is over this word."
+
+Curve editor.
+
+Build images for graphics7 lecture.
+
+Include other files.
+
+When caret goes near top or bottom, start scrolling.
+
+Implement syncing up the left/right scroll.
+
+Make visualization of tree.
+
+Option to display a list of links.
+
+A standard library that doesn't need to be at the top of the doc.
+
+Bird movies.
+
+English grammar.
+
+An Eliza example.
+
+Option to see geometry as axes in renderer.
+
+DONE Add annotation.
+
+DONE Undo
+
+DONE Draw directly onto document.
+
+DONE Correct behavior for shared evals (bubble down to lower block levels).
+
+DONE Move menu to top right.
+
+DONE Help facility for hot keys.
+
+DONE Implement cntrl-f text search through doc.
+
+DONE Fix up the look of block outlines.
+
+DONE Save to a file.
+
+DONE Make sure there are no redundant anchor names.
+
+DONE move code to <include> block.
+
+DONE button shows all choices on mouse-over
+
+DONE music
+   name = Instrument.name(int id);
+   piano1 = new Instrument("Piano");
+   piano1.press(int pitch, double loudness);
+   piano1.release(int pitch);
+   piano1.play(int pitch, double loudness, double duration);
+
+DONE escape key to force a reload from file
+
+DONE Graphics 3
+
+   multiplying matrices
+
+     -- math to multiply matrices
+
+     -- matrix multiplication is not commutative
+
+   primitives:
+      identity
+      translate
+      rotateX
+      rotateY
+      rotateZ
+      scale
+
+   tree of matrix transformations
+
+   parent / child limbs
+
+     -- implement in class: swinging arm with hand.
+
+   homework
+
+      implement a matrix class.
+      demonstrate it.
+

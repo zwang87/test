@@ -1,0 +1,230 @@
+<include>
+   pi = Math.PI;
+
+   lerp(t,a,b) { return a + t * (b - a); }
+
+   abs(t) { return Math.abs(t); }
+   cos(t) { return Math.cos(t); }
+   sin(t) { return Math.sin(t); }
+   noise(x) { return Noise.noise(x); }
+   noise(x,y) { return Noise.noise(x,y); }
+   noise(x,y,z) { return Noise.noise(x,y,z); }
+
+   fx = -100;
+   fy = -100;
+
+   mouseMove(x, y) {
+      fx = draw.fx(x);
+      fy = draw.fy(y);
+   }
+
+   px(x,y,z) { return (7 * x - 3.4 * z) / (10 - .1*z); }
+   py(x,y,z) { return (7 * y - 3.4 * z - .3*x) / (10 - .1*z); }
+
+   X(u,v) { return px( x(u,v), y(u,v), z(u,v) ); }
+   Y(u,v) { return py( x(u,v), y(u,v), z(u,v) ); }
+
+   axesColor = Color.blue;
+   veryLightGray = new Color(220,220,220);
+   lightGray = new Color(160,160,160);
+
+   draw2DAxes() {
+      draw.setColor(axesColor);
+      draw.fillThickLine(-1, 0, 1, 0, 0.01);
+      draw.fillThickLine(0, -1, 0, 1, 0.01);
+   }
+
+   draw3DAxes() {
+      draw.setColor(axesColor);
+      draw.fillThickLine(px(-2,0,0),py(-2,0,0),px(2,0,0),py(2,0,0), 0.01);
+      draw.fillThickLine(px(0,-2,0),py(0,-2,0),px(0,2,0),py(0,2,0), 0.01);
+      draw.fillThickLine(px(0,0,-2),py(0,0,-2),px(0,0,2),py(0,0,2), 0.01);
+   }
+
+   String round(double value) {
+      String s = "" + ((int)(100 * value) / 100.);
+      int i = s.indexOf('.');
+      if (i < 0)
+         return s + ".00";
+      int n = s.length() - i;
+      switch (n) {
+      case  1: return s + "00";
+      case  2: return s + "0";
+      }
+      return s;
+   }
+</include>
+
+<center>
+<b>PERSPECTIVE</b>
+</center>
+
+Let's think through what is really going on with perspective when we render a computer graphics scene.
+
+We want to model a camera lens positioned at (0,0,f) that is looking toward the origin (0,0,0).
+
+In other words, the camera lens will be, say, <eval>f=2.0</eval> units away from the origin, in the positive z direction, and will be facing toward the -z direction. We will refer to f as the "focal length" of the camera.
+
+<figure>
+   f = 2.0;
+   x = 0.7;
+   y = 0.5;
+   th = 0.016;
+   draw() {
+      draw3DAxes();
+      draw.setColor(Color.black);
+      draw.fillDisk(px(0,0,f),py(0,0,f), .05);
+      for (int sx = -1 ; sx <= 1 ; sx += 2)
+      for (int sy = -1 ; sy <= 1 ; sy += 2)
+         draw.fillThickLine(px(0,0,f),py(0,0,f),
+	                    px(sx*x,sy*y,0),
+			    py(sx*x,sy*y,0), th);
+      draw.fillThickLine(px(-x,y,0),py(-x,y,0),px(x,y,0),py(x,y,0), th);
+      draw.fillThickLine(px(-x,-y,0),py(-x,-y,0),px(x,-y,0),py(x,-y,0), th);
+      draw.fillThickLine(px(-x,-y,0),py(-x,-y,0),px(-x,y,0),py(-x,y,0), th);
+      draw.fillThickLine(px(x,-y,0),py(x,-y,0),px(x,y,0),py(x,y,0), th);
+
+      draw.drawText("(0,0,f)",px(0,0,f),py(0,0,f)-.2);
+   }
+</figure>
+
+We want all objects at z = 0 (that is, any object whose distance from the camera equals the focal length of the camera) to be neither magnified nor reduced in size, while objects that are farther away should appear smaller, and objects that are near should appear larger.
+
+Also, an object at z = -f should appear half its original size, since it is twice as far away from the camera lens as objects which are at the focal length.
+
+And an object at z = f/2 should appear twice as large as its original size, since it is half as far away from the camera lens as objects which are at the focal length.
+
+This is achieved by transforming x and y as follows:
+
+<indent>
+x <rarr> fx / (f-z)
+y <rarr> fy / (f-z)
+</indent>
+
+This helps explain the code I gave you to use in your homework for converting x,y,z to pixels.
+
+Since perspective keeps straight lines straight, it is a <i>linear transformation</i>, which means it can be described by a 4<times>4 matrix.  What is the matrix that corresponds to our camera perspective?
+
+A linear (matrix) transformation that produces the desired values of x and y is:
+<center>
+<eval>
+1    0    0    0
+0    1    0    0
+0    0    1    0
+0    0  -1/f   1
+</eval>
+</center>
+This matrix will transform (x,y,z,1) <rarr> (x, y, z, 1-z/f).
+
+If we divide through by the homogeneous coordinate w = (1-z/f), then we get a transformation that does what we want:
+
+(x , y , z) <rarr> (x / (1-z/f) , y / (1-z/f) , z / (1-z/f))
+
+which equals   (fx / (f-z) , fy / (f-z) , fz / (f-z))
+<shift 10>
+
+
+<center>
+<b>Forward kinematic animation hierarchy</b>
+</center>
+
+<image robot_arm.gif>
+
+In an earlier class I an example of an animated arm.
+
+To support animating a fully articulated skeleton, you can add some data structures to your Geometry object that support an interface something like the following:
+
+<eval ignore>
+public interface IGeometry
+{
+   public void add(Geometry child);    // add a child
+   public Geometry getChild(int i);    // get the ith child
+   public Matrix getMatrix();          // access the matrix
+   public int getNumChildren();        // number of children
+   public void remove(Geometry child); // remove a child
+}
+</eval>
+
+The matrix of a Geometry object contains the object's transformation relative to its parent object. These structures allow the objects in your scene to form a hierarchical tree. You should make a special object called world, which forms the root of this tree. Your renderer will traverse the tree, starting at this root world object, to find all the objects in your scene.
+
+Note that you do not need to maintain an explicit matrix stack. Instead, you can keep a separate globalMatrix inside each Geometry object, which contains the result, in each animation frame, of multiplying the parent object's globalMatrix by the object's relative matrix.
+
+After you have computed the value an object's globalMatrix for the current animation frame, you can then use that globalMatrix to transform the vertices of the object, placing the transformed vertices into a working array (don't modify the values of the Geometry object's original vertices array).
+
+You can then render the Geometry object by using the faces together with the transformed vertex locations in this working array.
+<shift 10>
+
+<b>Inverse kinematics</b>
+
+<figure>
+<button mode=0> points | distances | solution | unique </button>
+   draw() {
+      draw2DAxes();
+      draw.setColor(Color.black);
+      draw.fillDisk(-1, -.5, .05);
+      draw.fillDisk(.9,  .2, .05);
+
+      if (mode == 0) {
+         draw.drawText("ankle", -1, -.7);
+         draw.drawText("hip", .9, .42);
+      }
+
+      if (mode > 0) {
+         draw.drawDisk(-1, -.5, 1.0);
+         draw.drawDisk(.9,  .2, 1.3);
+      }
+
+      if (mode > 1) {
+         draw.setColor(Color.red);
+         draw.fillDisk(-.4, .29, .05);
+         draw.fillThickLine(-1,-.5,-.4,.29,.015);
+         draw.fillThickLine(.9, .2,-.4,.29,.015);
+
+         if (mode < 3) {
+            draw.fillDisk(-.03, -.71, .05);
+            draw.fillThickLine(-1,-.5,-.03,-.71,.015);
+            draw.fillThickLine(.9, .2,-.03,-.71,.015);
+         }
+      }
+
+      if (mode == 3) {
+         draw.setColor(Color.pink);
+         draw.fillArrow(-.42, .37, -.55, .74, .04);
+         draw.setColor(Color.red);
+         draw.drawArrow(-.42, .37, -.55, .74, .04);
+      }
+   }
+</figure>
+
+<indent>
+Implementing limbs
+</indent>
+
+<indent>
+<link ../ik/index.html>Explanation and simple example</link>
+<link ../../../2012/september/newfeet/index.html>Walking</link>
+</indent>
+
+<b>Dynamics</b>
+
+<indent>
+  implementing accelaration
+  implementing contact forces
+  implementing springs
+  particles
+  boids
+</indent>
+
+Building a full human body
+Building a machine (car, motor, clock)
+
+<b>Animation examples</b>
+
+<indent>
+<link http://www.youtube.com/watch?v=-3ODe9mqoDE>TRON Light Cycles</link>
+<link http://www.youtube.com/watch?v=PvCWPZfK8pI>Luxo Jr.</link>
+<link http://www.youtube.com/watch?v=aHUgdwyxTF0>For the Birds</link>
+<link http://www.youtube.com/watch?v=hQpMpsuRYTA>Carlitopolis</link>
+</indent>
+
+

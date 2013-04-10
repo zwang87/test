@@ -1,0 +1,35 @@
+#!/bin/sh
+
+cat >testdoc.html <<EndOfDoc
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Graphics</title>
+<style>
+html { height : 100% ; width : 100% ; margin : 0px ; }
+body { background-color : black ; height : 100% ; width : 100% ; margin : 0px ; }
+#prose_applet { width : 100% ; height : 100% ; float : left ; }
+</style>
+
+</head>
+
+<body>
+<applet id="prose_applet" code="TestDoc" codebase="build/jar" archive="bean9e.jar" width="640" height="700">
+<param name="file" value="$1"/>
+</applet>
+<script>
+// a hack: Safari does not give the applet mousewheel events
+(function () {
+    var applet_elem = document.getElementById('prose_applet');
+    applet_elem.addEventListener('mousewheel', function (e) {
+        prose_applet.mouseWheelMovedFromBrowser(e.wheelDelta);
+    }, false);
+})();
+</script>
+</body>
+</html>
+EndOfDoc
+
+appletviewer -J-Xmx1024M -J-Djava.security.policy=test/openPolicy.sec testdoc.html
+

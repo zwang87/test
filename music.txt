@@ -1,0 +1,120 @@
+<b>Music on the piano keyboard</b>
+
+From low C to high C on the piano is one <i>octave</i>:
+
+<figure name=octave>
+<button mode=0> notes | chords </button>
+
+   double x(int i) {
+      return .3 * (i - (scale.length - 1.0) / 2);
+   }
+
+   void setId(int i) {
+      instr = new Instrument(id = i);
+   }
+
+   void xy2I(int x, int y) {
+      fx = draw.fx(x);
+      fy = draw.fy(y);
+      for (I = scale.length - 1 ; I >= 0 ; I--)
+         if(fy>=-.3 && fy<.3 && fx>=x(I)-.12 && fx<x(I)+.12)
+	    return;
+   }
+
+   void keyRelease(int key) {
+      switch (key) {
+      case '-':
+         setId(Math.max(0, id - 1));
+	 break;
+      case '=':
+         setId(id + 1);
+	 break;
+      }
+   }
+
+   void mouseMove(int x, int y) {
+      xy2I(x,y);
+   }
+
+   void mousePress(int x, int y) {
+      down = true;
+      if (I >= 0)
+         press(I);
+   }
+
+   void mouseDrag(int x, int y) {
+      J = I;
+      xy2I(x,y);
+      if (J >= 0 && I != J)
+         release(J);
+      if (I >= 0 && I != J)
+	 press(I);
+   }
+
+   void mouseRelease(int x, int y) {
+      down = false;
+      if (I >= 0)
+         release(I);
+   }
+
+   C = 60;
+
+   void press(int I) {
+      if (mode == 0)
+         instr.press(C + scale[I], 0.5);
+      else
+         for (int n = 0 ; n < chords[I].length ; n++)
+            instr.press(C + scale[chords[I][n]], 0.5);
+   }
+
+   void release(int I) {
+      if (mode == 0)
+         instr.release(C + scale[I]);
+      else
+         for (int n = 0 ; n < chords[I].length ; n++)
+            instr.release(C + scale[chords[I][n]]);
+   }
+
+   void draw() {
+      draw.setColor(bgColor);
+      draw.fillBox(0,0,1.5);
+      for (int i = 0 ; i < scale.length ; i++) {
+         draw.setColor(! isAt(i)
+	    ? Color.white
+	    : down ? Color.blue : hoverColor );
+         draw.fillBox(x(i), 0, .12, .3);
+         draw.setColor(Color.black);
+         draw.drawBox(x(i), 0, .12, .3);
+	 draw.drawText("cdefgabc".substring(i,i+1), x(i), 0);
+      }
+      draw.drawText(Instrument.name(id), 0, -.7);
+   }
+
+   boolean isAt(int i) {
+      if (mode == 0)
+         return i == I;
+      else if (I >= 0)
+         for (int n = 0 ; n < chords[I].length ; n++)
+	    if (i == chords[I][n])
+	       return true;
+      return false;
+   }
+
+   Instrument instr;
+   int id = 0, I = -1;
+   double fx = -10.0, fy = 0.0;
+   boolean down = false;
+   Color bgColor = new Color(100,230,255);
+   Color hoverColor = new Color(120,180,255);
+   int[] scale = {0,2,4,5,7,9,11,12};
+   int[][] chords = {
+      {0,2},{1,3},{2,4},{1,3,5},{2,4,6},
+      {3,5},{4,6},{5,7}
+   };
+
+   {
+      setId(0);
+   }
+
+</figure>
+

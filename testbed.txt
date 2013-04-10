@@ -1,0 +1,75 @@
+<eval> red = 0.2 </eval>
+
+<figure name=test>
+<button mode=0> red | green | blue </button>
+<highlight state=false duration=0.2> state </highlight>
+
+   Color myColor;
+
+   keyPress(key) {
+      piano.press(60, 0.5);
+   }
+
+   keyRelease(key) {
+      piano.release(60);
+   }
+
+   mousePress(x, y) { }
+
+   void mouseDrag(x, y) { }
+
+   void mouseRelease(x, y) { }
+
+   piano = new Instrument("Recorder");
+
+   red = 0.9;
+   green = 0.9;
+   blue = 1.0;
+
+   overlay() {
+      if ( myColor == null ||
+           mode(0) > 0 && mode(0) < 1 ||
+           mode(1) > 0 && mode(1) < 1 ||
+           mode(2) > 0 && mode(2) < 1 )
+         myColor = new Color((int)(255 * mode(0)),
+                             (int)(255 * mode(1)),
+                             (int)(255 * mode(2)));
+
+      x = mode(2) - mode(0);
+      y = 0;
+
+      draw.setColor(myColor);
+      draw.fillDisk(x, y, 0.7);
+
+      draw.setColor(Color.black);
+      draw.drawText(round(mode(0)) + " " +
+                    round(mode(1)) + " " +
+		    round(mode(2)), x, y);
+
+      draw.drawText(round(state()), 0, -.5);
+   }
+
+   setup() {
+      render.setBgColor(red, green, blue);
+   }
+
+   update() {
+      render.setBgColor(red, green, blue);
+   }
+
+   String round(double value) {
+      String s = "" + ((int)(100 * value) / 100.);
+      int i = s.indexOf('.');
+      if (i < 0)
+         return s + ".00";
+      int n = s.length() - i;
+      switch (n) {
+      case  1: return s + "00";
+      case  2: return s + "0";
+      }
+      return s;
+   }
+
+</figure>
+
+This is a test.

@@ -1,0 +1,245 @@
+<b>What is computer graphics used for? </b>
+Movies
+Games
+Architecture
+Art
+Scientific visualization
+  -- Physics
+  -- Chemistry
+  -- Biology
+  -- Medical
+  -- Manufacturing
+  -- Weather
+  -- ...
+User Interfaces
+  -- Spread sheets
+  -- Navigation
+     -- GPS
+     -- Cockpit heads Up displays
+     -- Google maps
+  -- Structural diagrams
+  -- ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<b>The essential parts of a computer graphics system:</b>
+
+-- Modeling
+-- Animation
+-- Rendering
+-- User interface
+
+<figure name=fig1>
+<button mode=0> pipeline | model | animate | render | user </button>
+   int x(double f) { return (int)(width * f); }
+   int y(double f) { return (int)(height * f); }
+   Color bubbleColor = new Color(255, 200, 200);
+   void draw() {
+      draw.setColor(bubbleColor);
+      draw.drawTextBubble("Modeling" , x(.5 ), y(.2), 120, 50);
+      draw.drawTextBubble("Animation", x(.5 ), y(.8), 120, 50);
+      draw.drawTextBubble("Rendering", x(.8 ), y(.5), 120, 50);
+      draw.drawTextBubble("User"     , x(.15), y(.5),  80, 50);
+
+      draw.setColor(Color.black);
+      switch (mode) {
+      case 4: draw.fillArrow(x(.57),y(.50),x(.30),y(.50),5);
+      case 3: draw.fillArrow(x(.72),y(.80),x(.85),y(.65),5);
+              draw.fillArrow(x(.72),y(.20),x(.85),y(.35),5);
+      case 2: draw.fillArrow(x(.15),y(.65),x(.3 ),y(.80),5);
+      case 1: draw.fillArrow(x(.15),y(.35),x(.3 ),y(.20),5);
+      }
+   }
+</figure><b></b>
+
+
+
+
+
+
+
+
+
+<b>Different levels of user interface:</b>
+
+-- <b><i>Easiest to use:</i></b> GUI
+-- <b><i>Most general:</i></b> specification (script)
+
+<figure name=fig2>
+<button mode=0> interface | script | coder | GUI | artist </button>
+   int x(double f) { return (int)(width * f); }
+   int y(double f) { return (int)(height * f); }
+   Color bubbleColor = new Color(200, 220, 255);
+   Color pinkColor = new Color(255, 200, 200);
+   Color lightGray = new Color(200, 210, 220);
+   void draw() {
+      draw.setColor(lightGray);
+      draw.fillRect(0, y(.70), width, height - y(.70));
+      draw.setColor(bubbleColor);
+      switch (mode) {
+      case 4:
+              draw.setColor(pinkColor);
+              draw.drawTextBubble("visual artist"  , x(.75), y(.11), 125, 30);
+              draw.fillArrow(x(.28), y(.35), x(.28), y(.22), 5);
+              draw.setColor(Color.black);
+              draw.drawArrow(x(.28), y(.35), x(.28), y(.22), 5);
+              draw.setColor(bubbleColor);
+      case 3:
+              draw.drawTextBubble("GUI"            , x(.28), y(.11), 100, 50);
+      case 2:
+              draw.setColor(pinkColor);
+              draw.drawTextBubble("programmer"     , x(.75), y(.45), 140, 30);
+              draw.fillArrow(x(.28), y(.70), x(.28), y(.56), 5);
+              draw.setColor(Color.black);
+              draw.drawArrow(x(.28), y(.70), x(.28), y(.56), 5);
+              draw.setColor(bubbleColor);
+      case 1:
+              draw.drawTextBubble("Script"         , x(.28), y(.45), 120, 50);
+      case 0:
+              draw.drawTextBubble("Implementation" , x(.50), y(.85), 170, 50);
+      }
+      draw.setColor(Color.black);
+      draw.fillRect(x(0), y(.70), width, 2);
+   }
+</figure><b></b>
+
+
+
+
+<b>Objects have attributes:</b>
+
+-- The shape of the object
+-- The material properties of the object
+-- The position / orientation / scale of the object
+
+
+<figure name=fig3>
+<button mode=0> object | shape | material | matrix | light </button>
+   int x(double f) { return (int)(width * f); }
+   int y(double f) { return (int)(height * f); }
+   Color bubbleColor = new Color(200, 220, 255);
+   Color lightColor = new Color(255, 220, 220);
+   void draw() {
+      draw.setColor(bubbleColor);
+      draw.drawTextBubble("Thing", x(.50), y(.50), 110, 75);
+
+      if (mode >= 1) draw.drawTextBubble("Shape"   , x(.20), y(.11), 100, 40);
+      if (mode >= 2) draw.drawTextBubble("Material", x(.80), y(.11), 120, 40);
+      if (mode >= 3) draw.drawTextBubble("Matrix"  , x(.20), y(.89), 100, 40);
+      draw.setColor(Color.black);
+      draw.fillArrow(x(.22),y(.22),x(.33),y(.33),4);
+      draw.fillArrow(x(.22),y(.78),x(.33),y(.67),4);
+      draw.fillArrow(x(.78),y(.22),x(.67),y(.33),4);
+
+      if (mode >= 4) {
+      draw.setColor(lightColor);
+      draw.drawTextBubble("Lighting", x(.80), y(.89), 120, 40);
+      draw.setColor(Color.black);
+      draw.fillArrow(x(.78),y(.78),x(.67),y(.67),4);
+      }
+   }
+</figure><b></b>
+
+
+
+
+
+<b>General sequence for user:</b>
+
+-- First create shapes
+-- Then define material properties
+-- Then create/refine animation
+
+<figure name=fig4>
+   Geometry thing;
+   Material material;
+   void setup() {
+      render.showMesh = false;
+
+      render.addLight( 1, 1, 1, 1, 1, 1);
+      render.addLight(-1,-1,-1, 1, 1, 1);
+
+      thing = render.getWorld().add();
+      thing.torus(16, 16, .4);
+
+      material = new Material();
+      material.setAmbient(.2, .1, .0);
+      material.setDiffuse(.4, .2, .0);
+      material.setSpecular(1, .5, 0, 10);
+
+      thing.setMaterial(material);
+   }
+
+   double myTime = 0, previousTime = 0;
+
+   Color transparentBlue = new Color(0,0,255,128);
+
+   void overlay() {
+      draw.setColor(Color.red);
+      //draw.drawBox(0,.3,.4,.2,.15);
+      //draw.drawText("hi there", 0, .3);
+      //draw.fillDisk(0,0,.3,.2);
+      draw.setColor(transparentBlue);
+      draw.fillBox(.2,.2,.25);
+   }
+
+   void draw() {
+      draw.setColor(Color.red);
+      draw.fillBox(0,0,.2);
+/*
+      if ((time % 10) < 5) {
+         material.setTransparency(0.0);
+         myTime = myTime + time - previousTime;
+      }
+      else {
+         material.setTransparency(0.5);
+      }
+      previousTime = time;
+*/
+      Matrix matrix = thing.getMatrix();
+
+      matrix.identity();
+      matrix.rotateY(2 * myTime);
+      matrix.translate(2, Math.sin(4 * myTime), Math.cos(4 * myTime));
+      matrix.scale(1, 1, 3);
+   }
+</figure><b></b>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

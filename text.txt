@@ -1,0 +1,67 @@
+Hi <color #a080ff>you</color> there!
+<b>This is a test</b>
+Ok, this is <color magenta>starting</color> to <i>work!</i>
+You can see that this is really a whole bunch of text so we will get wrap-around.  This is a whole bunch of text so we will get wrap-around.
+Let's try<slider> A slider widget </slider>right here.
+Let's try<slider> another slider widget </slider>right here.
+Here is a<highlight x1=false> highlighting of text.</highlight>
+This is an eval tag: <eval>1 + 1</eval>
+Here is a<button 0> choice 1 | and choice 2 </button>
+<figure name=fig1>
+//<button shape=0>make round|make square</button>
+//<slider right=0>move to right</slider>
+//<highlight isRed=false>is red</highlight>
+Color bg = new Color(215, 235, 255);
+void draw() {
+   draw.setColor(bg);
+   draw.fillRect(0, 0, width, height);
+   draw.setColor(isRed ? Color.red : Color.green);
+   int x = (int)(width * (0.25 + 0.5 * right));
+   int y = height / 2;
+   switch (shape) {
+   case 0: draw.fillRect(x - 20, y - 20, 40, 40);break;
+   case 1: draw.fillOval(x - 20, y - 20, 40, 40);break;
+   }
+}
+</figure>
+Hello <color #a080ff>you</color> there
+<b>This is a test</b>
+Ok, this is <color magenta>starting</color> to <i>work!</i>
+You can see that this is really a whole bunch of text so we will get wrap-around.  This is a whole bunch of text so we will get wrap-around.
+Let's try<slider> A slider widget </slider>right here.
+Here is a<highlight> highlighting of text.</highlight>
+Here is a<button 0> choice 1 | and choice 2 </button>
+<figure name=fig2>
+//<slider len=0.5>length</slider>
+   Geometry shape;
+   double theta = 0.0;
+   public void setup() {
+      render.setBgColor(.7,.8,1);
+      render.addLight( 1, 1, 1, 1, 1, 1);
+      render.addLight(-1,-1,-1, 1, 1, 1);
+      Material m = new Material();
+      m.setAmbient(0,.2,0);
+      m.setDiffuse(0,.8,0);
+      m.setSpecular(1,1,1,10);
+      shape = render.getWorld().add().cube();
+      shape.setMaterial(m);
+   }
+   public void draw() {
+      draw.setColor(Color.cyan);
+      draw.fillRect(50, 50, 100, 100);
+      shape.getMatrix().identity()
+           .rotateY(time)
+           .scale(1,1,2*len);
+   }
+   public void overlay() {
+      draw.setColor(Color.yellow);
+      draw.fillOval(100, 100, 50, 50);
+   }
+   public void mouseDown(int x, int y) {
+      System.err.println(x + "," + y);
+   }
+</figure>
+
+
+
+x

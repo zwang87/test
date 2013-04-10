@@ -1,0 +1,398 @@
+<common>
+   pi = Math.PI;
+
+   lerp(t,a,b) { return a + t * (b - a); }
+
+   abs(t) { return Math.abs(t); }
+   cos(t) { return Math.cos(t); }
+   sin(t) { return Math.sin(t); }
+   noise(x) { return Noise.noise(x); }
+   noise(x,y) { return Noise.noise(x,y); }
+   noise(x,y,z) { return Noise.noise(x,y,z); }
+
+   fx = -100;
+   fy = -100;
+
+   mouseMove(x, y) {
+      fx = draw.fx(x);
+      fy = draw.fy(y);
+   }
+
+   px(x,y,z) { return (7 * x - 3.4 * z) / (10 - .1*z); }
+   py(x,y,z) { return (7 * y - 3.4 * z - .3*x) / (10 - .1*z); }
+
+   X(u,v) { return px( x(u,v), y(u,v), z(u,v) ); }
+   Y(u,v) { return py( x(u,v), y(u,v), z(u,v) ); }
+
+   axesColor = Color.blue;
+   veryLightGray = new Color(220,220,220);
+   lightGray = new Color(160,160,160);
+
+   draw2DAxes() {
+      draw.setColor(axesColor);
+      draw.fillThickLine(-1, 0, 1, 0, 0.01);
+      draw.fillThickLine(0, -1, 0, 1, 0.01);
+   }
+
+   draw3DAxes() {
+      draw.setColor(axesColor);
+      draw.fillThickLine(px(-2,0,0),py(-2,0,0),px(2,0,0),py(2,0,0), 0.01);
+      draw.fillThickLine(px(0,-2,0),py(0,-2,0),px(0,2,0),py(0,2,0), 0.01);
+      draw.fillThickLine(px(0,0,-2),py(0,0,-2),px(0,0,2),py(0,0,2), 0.01);
+   }
+
+   String round(double value) {
+      String s = "" + ((int)(100 * value) / 100.);
+      int i = s.indexOf('.');
+      if (i < 0)
+         return s + ".00";
+      int n = s.length() - i;
+      switch (n) {
+      case  1: return s + "00";
+      case  2: return s + "0";
+      }
+      return s;
+   }
+</common>
+<b>Computing distance and surface normal</b>
+
+<block>
+<b>Convert Z to perspective coords to evaluate depth:</b>
+
+For each vertex, after the Matrix transform,
+we can do a perspective transform:
+<code>
+   x<sub>p </sub> = f * x / (f - z)
+   y<sub>p </sub> = f * y / (f - z)
+   z<sub>p </sub> = f * z / (f - z)
+</code>
+<block>
+(by applying the camera's perspective matrix)
+<eval ignore>
+
+   1   0   0   0
+   0   1   0   0
+   0   0   1   0
+   0   0 -1/f  1
+
+</eval>
+</block>
+
+where f is focal length of the camera.
+
+On the image, this vertex will be at pixel:
+<code>
+      col = width/2  + (int)(height * x<sub>p </sub>)
+      row = height/2 - (int)(height * y<sub>p </sub>)
+</code>
+The "depth" of the vertex at this pixel is z<sub>p</sub>.
+
+</block>
+
+<block>
+<b>Surface normal:</b>
+
+The "normal" vector N of a surface is the perpendicular direction facing outward from that surface.
+<figure>
+   double[] x = {-.5,.5,.5,-.5};
+   double[] y = {-.5,-.5,.5,.5};
+   double[] z = {-.5,0,.5,0};
+   draw() {
+      n = x.length;
+      for (i = 0 ; i < n ; i++) {
+         j = (i + 1) % n;
+	 xi = px(x[i],y[i],z[i]);
+	 yi = py(x[i],y[i],z[i]);
+	 xj = px(x[j],y[j],z[j]);
+	 yj = py(x[j],y[j],z[j]);
+         draw.fillThickLine(xi,yi,xj,yj,.01);
+      }
+      draw.fillArrow(px(0,0,0),py(0,0,0),
+                     px(0,0,-1),py(0,0,-1), .028);
+      draw.drawText("N", px(0,0,-1)+.1,py(0,0,-1)+.1);
+   }
+</figure>
+This vector N = (nx,ny,nz) controls how a surface responds to light.  N is always unit length.
+
+</block>
+
+<block open>
+<b>Computing the surface normal</b>
+
+From now on you should change your vertices to contains six values, to account for both location and surface normal:
+
+   <eval ignore>
+      vertex[i] = { x, y, z, nx, ny, nz };
+   </eval>
+
+So rather than a declaration in your program like this:
+
+   <eval ignore>
+      double[][] vertex = new double[nVertices][3];
+   </eval>
+
+you should have one that looks like this:
+
+   <eval ignore>
+      double[][] vertex = new double[nVertices][6];
+   </eval>
+
+For simple shapes like a cube, sphere or cylinder, you can directly compute the surface normal:
+
+<bullet> <i>Cube:</i>
+      Normals are (-1,0,0), (1,0,0), (0,-1,0), etc.
+
+<bullet> <i>Sphere:</i>
+      Normal at point (x,y,z) is just (x,y,z)
+
+<bullet> <i>Cylinder:</i>
+      Normal around tube is (cos<theta>, sin<theta>, 0).
+      Normal at end caps are (0,0,-1) and (0,0,1), respectively.
+
+<block open>
+Computing vertex normals for a polyhedral mesh:
+
+<figure>
+<highlight edges=false> edges </highlight>
+   Geometry shape;
+   setup() {
+      Material material = new Material();
+      material.setAmbient(0.2, 0.1, 0.1);
+      material.setDiffuse(0.8, 0.4, 0.4);
+
+      render.addLight( 1, 1, 1, 1, 1, 1);
+      render.addLight(-1,-1,-1, 1, 1, 1);
+      render.setFOV(0.3);
+
+      N = 3;
+      shape = render.getWorld().add().mesh(N,N);
+      shape.setMaterial(material);
+
+      vertices = shape.vertices;
+      for (int i = 0 ; i <= N ; i++)
+      for (int j = 0 ; j <= N ; j++) {
+         int n = i + (N + 1) * j;
+         v = vertices[n];
+         v[2] = (sin(1.5*i - .5) + sin(1.5*j - .5)) / 4;
+      }
+      shape.computePolyhedronNormals();
+   }
+   update() {
+      render.showMesh = edges;
+      shape.getMatrix().identity().rotateX(-.7).rotateY(-.3);
+   }
+</figure>
+
+<block>
+for each face: sum cross products of successive edges
+
+   For each face, compute a faceDirection as follows:
+
+   (1) Set faceDirection to [0,0,0]
+
+   (2) For each three successive vertices A,B,C around face:
+
+                faceDirection += (C-B) <times> (B-A)
+
+<image face-normals.png 0.7>
+
+<block>
+<i>about cross products:</i>
+
+The "cross product" of two vectors <b>a</b> and <b>b</b> is defined as the products of their lengths times the sine of the angle between them:
+
+<center>
+<b>a</b> <times> <b>b</b> = |a| |b| sin<theta>
+</center>
+
+You can compute it as follows:
+
+<b>a</b> <times> <b>b</b> = (a<sub>y</sub>b<sub>z</sub> - a<sub>z</sub>b<sub>y</sub> , a<sub>z</sub>b<sub>x</sub> - a<sub>x</sub>b<sub>z</sub> , a<sub>x</sub>b<sub>y</sub> - a<sub>y</sub>b<sub>x</sub>)
+
+</block>
+
+</block>
+
+<block>
+for each vertex: sum neighbor faceDirection vectors and normalize
+
+       (1)  Sum faceDirections of all faces containing this vertex
+
+       (2)  Normalize this sum to unit length
+
+</block>
+
+</block>
+</block>
+
+<block>
+<b>Transforming surface normals</b>
+
+<block>
+What does transformed N need to do?
+
+It needs to stick out perpendicularly from the transformed shape.
+
+This means it needs to act like a plane, not a point.
+
+<image plane.gif>
+
+</block>
+
+<block>
+So let's first talk about planes in three dimensions.
+
+Consider P = (a,b,c,d), describing the plane ax + by + cz + d.
+
+<block>
+Normal N can be expressed as a plane equation.
+
+Specifically, the plane equation: ax + by + cz + 0.
+
+</block>
+
+<block>
+Transforming normal N is going to follow the same rules
+as transforming any plane P = (a,b,c,d).
+
+A plane P is defined by what points X are on that plane.
+
+Point X will be contained in plane P exactly when P<dot>X = 0.
+
+That is:
+
+           when (a,b,c,d) <dot> (x,y,z,1) = 0
+or:
+           when ax + by + cz + d = 0
+
+</block>
+</block>
+
+<block>
+We can apply this insight to transforming normals.
+
+When we transform P, we need to preserve the value of P<dot>X.
+
+<block>
+Which means that P<dot>X = PM<sup>-1</sup><dot>MX.
+
+<i>Derivation:</i>
+
+   PM<sup>-1</sup><dot>MX =
+   P(M<sup>-1</sup><dot>M)X =
+   P(I)X =
+   PX
+
+</block>
+
+So P is transformed to PM<sup>-1</sup>.
+
+To transform normal N:
+
+we need to compute: N<dot>M<sup>-1</sup>
+
+Which is the same as: (M<sup>-1</sup>)<sup>T</sup><dot>N
+
+To transpose a matrix, just swap its rows and columns.
+
+To invert a matrix, you can use <link http://mrl.nyu.edu/~perlin/Invert.java>Invert.java</link>.
+
+</block>
+
+</block>
+
+<block>
+<b>ZBuffer</b>
+
+<image zbuffer.png 1.2>
+
+<block>
+(1) Initialize zbuffer to "infinitely far"
+
+Since z<sub>p</sub> = fz / (f - z), 
+
+we can look at the limit as z <rarr> -<infin>.
+
+When we do that, we see that z<sub>p</sub> <rarr> -f.
+
+So we can just initialize all zbuffer values to -f.
+
+</block>
+
+<block>
+(2) Loop through triangles
+<indent>
+
+Scan through pixels.
+
+For each pixel at index:
+
+<indent>
+<eval ignore>
+i = col + row * nCols
+</eval>
+</indent>
+
+Interpolate from vertices r,g,b,z<sub>p</sub>.
+
+If z<sub>p</sub> <gt> zBuffer[i]:
+<indent>
+
+replace values at that pixel as follows:
+
+<indent>
+pix[i] = pack(r,g,b);
+zBuffer[i] = z<sub>p</sub>;
+</indent>
+</indent>
+</indent>
+
+</block>
+
+<block>
+Modify your triangle scan-conversion algorithm as follows:
+
+<indent>
+Going into your scan-conversion algorithm, rather than just the pixel values (x,y) for each of your triangle's three vertices, you also need each vertex to maintain four more values: r,g,b,z<sub>p</sub>, where for this week's assignment r,g,b will be computed from surface normal (as described above), and where z<sub>p</sub> is the perspective z obtained from the expression <b>fz/(f-z)</b>.
+
+When you compute the x value for D (by linearly interpolating the x values of vertices A and C) as you split your triangle into two trapezoids, you also need to linearly interpolate the r,g,b,z<sub>p</sub> values of A and C, to get r,g,b,z<sub>p</sub> values at D.
+
+You will now have trapezoids that have, at each of their TL,TR,BL,BR vertices, not just a single x value, but five values: x,r,g,b,z<sub>p</sub>.  As you linearly interpolate to get the leftmost and rightmost x for each scanline, you also need to linearly interpolate r,g,b,z<sub>p</sub> for that scanline.
+
+Finally, at each scanline, you now have leftmost and rightmost values for x,r,g,b,z<sub>p</sub>.  As you march along in x between those two extremal points, you need to linearly interpolate r,g,b,z<sub>p</sub>.  This will give you, at each pixel, the values you need to use for the zbuffer algorithm.
+</indent>
+
+</block>
+</block>
+
+<block>
+<b>Homework:</b>
+   Do scan-conversion using Z-buffer algorithm.
+
+   Compute normals
+
+   Map normal nx,ny,nz to r,g,b, where:
+<code>
+      nx = -1.0...1.0  </code><rarr><code>  r = 0...255
+      ny = -1.0...1.0  </code><rarr><code>  g = 0...255
+      nz = -1.0...1.0  </code><rarr><code>  b = 0...255
+</code>
+   Create an image of normals.
+
+<image normals.jpg>
+
+</block>
+
+<block>
+<b>Inspirational videos:</b>
+<block>
+Artificial retina
+
+<image artificial-retina.jpg 1.88>
+
+</block>
+<link http://www.youtube.com/watch?v=VzFpg271sm8>Worldbuilder</link>
+<link http://www.youtube.com/watch?v=fSfKlCmYcLc&playnext=1&list=PL5451CD2D667D2524&feature=results_video>Keiichi Matsuda</link>
+</block>
+
+<shift 5>

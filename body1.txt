@@ -1,0 +1,70 @@
+
+This is my cool example body:
+<figure aspect=1.0>
+<slider sFwd=0> s fwd </slider>
+<slider sUp=0> s up </slider>
+<slider eRot=0> e rot </slider>
+<slider eUp=0> e </slider>
+<slider wRot=.5> w </slider>
+   Geometry arm, s, e, w;
+   Geometry u, l, h;
+
+   Geometry eJoint;
+
+   setup() {
+      render.addLight( 1, 1, 1, 1, 1, 1);
+      render.addLight(-1,-1,-1, 1, 1, 1);
+      render.setFOV(0.5);
+
+      Material material = new Material();
+      material.setDiffuse(1, .6, .6);
+      material.setAmbient(.2, .12, .12);
+
+      arm = render.getWorld().add();
+
+      arm.setMaterial(material);
+
+      s = arm.add();
+      e = s.add();
+      w = e.add();
+   }
+
+   update() {
+
+      u = s.add().sphere(8);
+      matrix = u.getMatrix();
+      matrix.identity();
+      matrix.translate(0.5, 0, 0);
+      matrix.scale(0.5, 0.1 + .05*eUp, 0.1 + .05*eUp);
+
+      l = e.add().sphere(8);
+      matrix = l.getMatrix();
+      matrix.identity();
+      matrix.translate(0.5, 0, 0);
+      matrix.scale(0.5, 0.1, 0.1);
+
+      h = w.add().sphere(8);
+      matrix = h.getMatrix();
+      matrix.identity();
+      matrix.translate(0.2, 0, 0);
+      matrix.scale(0.2, 0.1, 0.1);
+
+      matrix = s.getMatrix();
+      matrix.identity();
+      matrix.rotateY(-sFwd);
+      matrix.rotateZ(sUp);
+
+      matrix = e.getMatrix();
+      matrix.identity();
+      matrix.translate(1.0, 0, 0);
+      matrix.rotateX(eRot);
+      matrix.rotateZ(2 * eUp);
+
+      matrix = w.getMatrix();
+      matrix.identity();
+      matrix.translate(1.0, 0, 0);
+      matrix.rotateZ(2 * wRot - 1);
+   }
+   
+</figure>
+

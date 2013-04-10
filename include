@@ -1,0 +1,56 @@
+<include>
+   pi = Math.PI;
+
+   lerp(t,a,b) { return a + t * (b - a); }
+
+   abs(t) { return Math.abs(t); }
+   cos(t) { return Math.cos(t); }
+   sin(t) { return Math.sin(t); }
+   noise(x) { return Noise.noise(x); }
+   noise(x,y) { return Noise.noise(x,y); }
+   noise(x,y,z) { return Noise.noise(x,y,z); }
+
+   fx = -100;
+   fy = -100;
+
+   mouseMove(x, y) {
+      fx = draw.fx(x);
+      fy = draw.fy(y);
+   }
+
+   px(x,y,z) { return (7 * x - 3.4 * z) / (10 - .1*z); }
+   py(x,y,z) { return (7 * y - 3.4 * z - .3*x) / (10 - .1*z); }
+
+   X(u,v) { return px( x(u,v), y(u,v), z(u,v) ); }
+   Y(u,v) { return py( x(u,v), y(u,v), z(u,v) ); }
+
+   axesColor = Color.blue;
+   veryLightGray = new Color(220,220,220);
+   lightGray = new Color(160,160,160);
+
+   draw2DAxes() {
+      draw.setColor(axesColor);
+      draw.fillThickLine(-1, 0, 1, 0, 0.01);
+      draw.fillThickLine(0, -1, 0, 1, 0.01);
+   }
+
+   draw3DAxes() {
+      draw.setColor(axesColor);
+      draw.fillThickLine(px(-2,0,0),py(-2,0,0),px(2,0,0),py(2,0,0), 0.01);
+      draw.fillThickLine(px(0,-2,0),py(0,-2,0),px(0,2,0),py(0,2,0), 0.01);
+      draw.fillThickLine(px(0,0,-2),py(0,0,-2),px(0,0,2),py(0,0,2), 0.01);
+   }
+
+   String round(double value) {
+      String s = "" + ((int)(100 * value) / 100.);
+      int i = s.indexOf('.');
+      if (i < 0)
+         return s + ".00";
+      int n = s.length() - i;
+      switch (n) {
+      case  1: return s + "00";
+      case  2: return s + "0";
+      }
+      return s;
+   }
+</include>

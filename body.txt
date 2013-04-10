@@ -1,0 +1,151 @@
+
+This is my cool example body:
+<figure aspect=1.0>
+<slider xLsy=0> L s about y </slider>
+<slider xLsz=0> L s about z </slider>
+<slider xLex=0> L e about x </slider>
+<slider xLez=0> L e about z </slider>
+<slider xLwz=.5> L w about z </slider>
+<slider xRsy=0> R s about y </slider>
+<slider xRsz=0> R s about z </slider>
+<slider xRex=0> R e about x </slider>
+<slider xRez=0> R e about z </slider>
+<slider xRwz=.5> R w about z </slider>
+   Geometry La, Ls, Le, Lw, Lu, Ll, Lh;
+   Geometry Ra, Rs, Re, Rw, Ru, Rl, Rh;
+
+   Geometry eJoint;
+
+   setup() {
+      render.addLight( 1, 1, 1, 1, 1, 1);
+      render.addLight(-1,-1,-1, 1, 1, 1);
+      render.setFOV(0.6);
+
+      Material material = new Material();
+      material.setDiffuse(1, .6, .6);
+      material.setAmbient(.2, .12, .12);
+
+      La = render.getWorld().add();
+      La.setMaterial(material);
+
+      Ls = La.add();
+      Le = Ls.add();
+      Lw = Le.add();
+
+      Lu = Ls.add().sphere(8);
+      Ll = Le.add().sphere(8);
+      Lh = Lw.add().sphere(8);
+
+      Ra = render.getWorld().add();
+      Ra.setMaterial(material);
+      Rs = Ra.add();
+      Re = Rs.add();
+      Rw = Re.add();
+      Ru = Rs.add().sphere(8);
+      Rl = Re.add().sphere(8);
+      Rh = Rw.add().sphere(8);
+   }
+
+   double Lsy,Lsz,Lex,Lez,Lwz;
+   double Rsy,Rsz,Rex,Rez,Rwz;
+
+   update() {
+      //double s = Math.sin(2 * time);
+      double s = Noise.noise(3 * time);
+      double c = Noise.noise(3 * time + 10);
+
+      Lsy = s;
+      Lsz = c;
+
+      Ley = s;
+      Lez = c + 1;
+
+      Rsy = s;
+      Rsz = c;
+
+      Rey = s;
+      Rez = c + 1;
+
+      Rsy = Math.sin(2 * time);
+      matrix = Lu.getMatrix();
+      matrix.identity();
+      matrix.translate(0.5, 0, 0);
+      matrix.scale(0.5, 0.1 + .05*Lez, 0.1 + .05*Lez);
+
+      matrix = Ll.getMatrix();
+      matrix.identity();
+      matrix.translate(0.5, 0, 0);
+      matrix.scale(0.5, 0.1, 0.1);
+
+      matrix = Lh.getMatrix();
+      matrix.identity();
+      matrix.translate(0.2, 0, 0);
+      matrix.scale(0.2, 0.1, 0.1);
+
+      matrix = Ls.getMatrix();
+      matrix.identity();
+      matrix.rotateY(-Lsy);
+      matrix.rotateZ(Lsz);
+
+      matrix = La.getMatrix();
+      matrix.identity();
+      matrix.translate( 0.5, 0, 0);
+
+
+
+      matrix = Le.getMatrix();
+      matrix.identity();
+      matrix.translate(1.0, 0, 0);
+      matrix.rotateX(Lex);
+      matrix.rotateZ(2 * Lez);
+
+      matrix = Lw.getMatrix();
+      matrix.identity();
+      matrix.translate(1.0, 0, 0);
+      matrix.rotateZ(2 * Lwz - 1);
+
+
+
+
+
+
+      matrix = Ru.getMatrix();
+      matrix.identity();
+      matrix.translate(-0.5, 0, 0);
+      matrix.scale(0.5, 0.1 + .05*Rez, 0.1 + .05*Rez);
+
+      matrix = Rl.getMatrix();
+      matrix.identity();
+      matrix.translate(-0.5, 0, 0);
+      matrix.scale(0.5, 0.1, 0.1);
+
+      matrix = Rh.getMatrix();
+      matrix.identity();
+      matrix.translate(-0.2, 0, 0);
+      matrix.scale(0.2, 0.1, 0.1);
+
+      matrix = Rs.getMatrix();
+      matrix.identity();
+      matrix.rotateY(-Rsy);
+      matrix.rotateZ(-Rsz);
+
+      matrix = Ra.getMatrix();
+      matrix.identity();
+      matrix.translate(-0.5, 0, 0);
+
+
+
+      matrix = Re.getMatrix();
+      matrix.identity();
+      matrix.translate(-1.0, 0, 0);
+      matrix.rotateX(Rex);
+      matrix.rotateZ(-2 * Rez);
+
+      matrix = Rw.getMatrix();
+      matrix.identity();
+      matrix.translate(-1.0, 0, 0);
+      matrix.rotateZ(-2 * Rwz + 1);
+   }
+   
+</figure>
+

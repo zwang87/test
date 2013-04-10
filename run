@@ -1,0 +1,17 @@
+#!/bin/sh
+
+cat >testsplitdoc.html <<HERE
+<body bgcolor=black>
+<center>
+
+<applet codebase="build/jar" code="TestSplitDoc.class" archive="bean9e.jar" width=640 height=700>
+<param name="browser" value="/Applications/Safari.app"/>
+<param name="file" value="$1"/>
+</applet>
+
+</center>
+</body>
+HERE
+
+# run appletviewer
+appletviewer -J-Xmx1024M -J-Djava.security.policy=test/openPolicy.sec testsplitdoc.html
