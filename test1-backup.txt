@@ -1,0 +1,297 @@
+<b>Linear transforms</b> in two dimensions can be represented as 3x3 matrices.
+
+We can use a 3x3 matrix to transform a point (x,y), which is represented by a homogeneous column vector <i>(x,y,w)</i>, where x = <i>x/w</i>, and y = <i>y/w</i>:
+<figure name=m3xv>
+<button row=0> row | top | middle | bottom </button>
+<button mode=0> expand | shrink </button>
+<button w=0> set w | w = 1 | w = 0 </button>
+  Font font = new Font("Sanserif", Font.PLAIN, height / 12);
+  String[] results0 = "ax+by+cw;dx+ey+fw;gx+hy+iw".split(";");
+  String[] results1 = "ax+by+c;dx+ey+f;gx+hy+i".split(";");
+  String[] results2 = "ax+by;dx+ey;gx+hy".split(";");
+  Color highlightColor = new Color(200, 220, 255);
+  void draw() {
+     draw.setFont(font);
+     double x0 = mode<1?-.75:-.85, x1 = .2, x2 = .96;
+
+     double v = -0.25 * (row - 2);
+     if (row > 0) {
+        draw.setColor(highlightColor);
+        draw.fillBox(x1,v, .35,.1,.05);
+        draw.fillBox(x2,0, .1,.35,.05);
+        draw.fillBox(x0,v, mode<1?.1:.42,.1,.05);
+     }
+     else {
+        draw.setColor(Color.blue);
+        draw.drawBox(x1,0, .36,.36);
+     }
+
+     draw.setColor(Color.blue);
+     switch (row) {
+     case 0:
+        draw.fillArrow(-.2,0,mode < 1 ? -.6 : -.4,0,.03);
+	break;
+     default:
+        draw.drawArrow(-.2,v,mode < 1 ? -.6 : -.4,v,.03);
+        break;
+     }
+     draw.fillThickLine(.59,-.09,.77,.09,.02);
+     draw.fillThickLine(.59,.09,.77,-.09,.02);
+
+     draw.setColor(Color.black);
+     for (int n = 0 ; n < 9 ; n++) {
+        double u =  .20 + .25 * ((n % 3) - 1);
+        double v = -.25 * ((n / 3) - 1);
+        draw.drawText((char)('a' + n) + "", u, v);
+     }
+     for (int j = 0 ; j < 3 ; j++) {
+        double v = -.25 * (j - 1);
+        draw.drawText((w==0?"xyw":w==1?"xy1":"xy0").substring(j, j+1), x2, v);
+	switch (mode) {
+	case 0:
+           draw.drawText("xyw".substring(j, j+1) + "'", x0, v);
+	   break;
+	default:
+           draw.drawText((w==0?results0:w==1?results1:results2)[j], x0, v);
+	   break;
+	}
+     }
+  }
+</figure><b></b>
+
+
+
+
+
+
+
+
+
+The extra coordinate <i>w</i> lets us represent regular points by setting w to 1, or points at infinity (direction vectors) by setting w to 0.
+<figure name=vector>
+<button mode=0> point | direction | 2 points | diff | b - a | b - a </button>
+    Color axesColor = new Color(128,128,255);
+    Font font = new Font("Sanserif", Font.PLAIN, height / 12);
+    String[] p0 = "3;2;1".split(";");
+    String[] p1 = "3;2;0".split(";");
+    String[] p2 = "-2 ;1;1".split(";");
+    String[] p3 = "5;1;0".split(";");
+    void draw() {
+       draw.setFont(font);
+       draw.setColor(axesColor);
+       draw.fillArrow(0, 0, 0, .95,.02);
+       draw.fillArrow(0, 0, .95, 0,.02);
+       draw.fillArrow(0, 0, 0,-.95,.02);
+       draw.fillArrow(0, 0,-.95, 0,.02);
+       draw.setColor(Color.blue);
+       if (mode < 5)
+          draw.drawBox(.87, .42, .1, .32,.1);
+       if (mode >= 2 && mode < 5)
+          draw.drawBox(-.63, .2, .11, .33,.1);
+       draw.setColor(Color.black);
+       switch (mode) {
+       case 0:
+          draw.fillDisk(0.6, 0.4, .06);
+	 break;
+       case 1:
+          draw.fillArrow(0, 0, .6, .4, .03);
+	 break;
+       case 2:
+       case 3:
+       case 4:
+       case 5:
+          draw.fillDisk(-.4, 0.2, .06);
+          draw.fillDisk(0.6, 0.4, .06);
+	 if (mode >= 3) {
+	     draw.setColor(Color.red);
+	     draw.fillArrow(-.33,.21,.55,.39,.03);
+	     if (mode < 5)
+	        draw.drawBox(.15,.68,.1,.32,.1);
+	     if (mode >= 4)
+	        draw.drawText("b-a", .25, .15);
+	     draw.setColor(Color.black);
+	     if (mode >= 4) {
+	        draw.drawText("a", -.4, .4);
+	        draw.drawText("b", .6, .6);
+	     }
+          }
+	 break;
+       }
+       for (int j = 0 ; j < 3 ; j++) {
+          double v0 = 0.42 - .2*(j-1);
+          double v1 = 0.20 - .2*(j-1);
+          double v2 = 0.68 - .2*(j-1);
+	 switch (mode) {
+	 case 0:
+             draw.drawText(p0[j], .87, v0);
+	     break;
+	 case 1:
+             draw.drawText(p1[j], .87, v0);
+	     break;
+	 case 2:
+	 case 3:
+	 case 4:
+             draw.drawText(p0[j], .87, v0);
+             draw.drawText(p2[j],-.6, v1);
+	     if (mode >= 3) {
+	        draw.setColor(Color.red);
+                draw.drawText(p3[j],.15, v2);
+	        draw.setColor(Color.black);
+             }
+          }
+       }
+    }
+</figure><b></b>
+
+
+
+
+
+
+
+
+
+
+
+
+The column vectors of the 3x3 matrix are just the coordinate system of the transformation:
+<figure>
+<button mode=3> matrix | vectors | example | translate | rotate </button>
+<button show=0> show | hide </button>
+   Color axesColor = new Color(170,170,170);
+   Color gridColor = new Color(200,200,200);
+   Color faded = new Color(160,160,160);
+   Font font = new Font("Sanserif", Font.PLAIN, height / 12);
+   Font smallFont = new Font("Sanserif", Font.BOLD, height / 16);
+   String[] p0 = "1;0;0;0;1;0;0;0;1".split(";");
+   String[] p1 = "1;0;1;0;1;2;0;0;1".split(";");
+   String[] p2 = "0;-1;0;1;0;0;0;0;1".split(";");
+   void draw() {
+      draw.setFont(font);
+      if (mode >= 2) {
+         draw.setColor(gridColor);
+	 for (int x = -3 ; x <= 3 ; x++)
+	    draw.fillBox(.3 + .2*x,0,.009,.7);
+	 for (int y = -3 ; y <= 3 ; y++)
+	    draw.fillBox(.3, .2*y,.7,.009);
+         if (show==0)
+            draw.setColor(axesColor);
+         draw.fillArrow(.3, 0, .3, .75,.02);
+         draw.fillArrow(.3, 0, 1.05, 0,.02);
+         draw.fillArrow(.3, 0, .3,-.75,.02);
+         draw.fillArrow(.3, 0,-.45, 0,.02);
+	 draw.setColor(mode<3?Color.black:faded);
+	 draw.fillDisk(.3 + 2*.2,1*.2,.05);
+         for (int j = 0 ; j < 3 ; j++) {
+            double v0 = 0.42 - .2*(j-1);
+         }
+      }
+      draw.setColor(Color.black);
+      for (int j = 0 ; j < 3 ; j++)
+      for (int i = 0 ; i < 3 ; i++) {
+         double u = -.95 + .28 * (i - 1);
+         double v = -.28 * (j - 1);
+	 if (mode < 2) {
+            draw.drawText(i==0?"x":i==1?"y":"t", u, v);
+            draw.setFont(smallFont);
+            draw.drawText("" + (char)('0'+j), u+.08, v-.08);
+            draw.setFont(font);
+         }
+	 else {
+	    switch (mode) {
+	    case 2:
+               drawValue(p0,i,j, u, v);
+	       break;
+	    case 3:
+               drawValue(p1,i,j, u, v);
+	       draw.fillDisk(.3 + 3*.2,3*.2,.05);
+	       break;
+	    case 4:
+               drawValue(p2,i,j, u, v);
+	       draw.fillDisk(.3 - 1*.2,2*.2,.05);
+	       break;
+	    }
+	 }
+	 if (mode==0)
+	    draw.drawBox(u+.04,v-.04,.14,.14);
+	 if (mode>=1 && j==1)
+	    draw.drawBox(u+.04,v-.04,.13,.45,.1);
+      }
+      if (show == 0) {
+	 draw.setColor(Color.red);
+         switch (mode) {
+	 case 3:
+	    for (int n = 1 ; n < 5 ; n++) {
+	       double t = n / 5.0;
+	       double u = .4 + .2 * t;
+	       double v = .2 + .4 * t;
+	       draw.fillDisk(.3 + u, v, .02);
+	    }
+	    break;
+	 case 4:
+	    for (int n = 1 ; n < 10 ; n++) {
+	       double theta = Math.PI / 2 * n / 10;
+	       double cos = Math.cos(theta);
+	       double sin = Math.sin(theta);
+	       double u = .4 * cos - .2 * sin;
+	       double v = .4 * sin + .2 * cos;
+	       draw.fillDisk(.3 + u, v, .02);
+	    }
+	    break;
+	 }
+      }
+      else {
+         draw.setColor(Color.red);
+	 switch (mode) {
+	 case 2:
+            draw.setColor(faintBlue);
+            draw.fillBox(.5,.1,.2,.1);
+	    show(.3,0, .5,0, .3,.2);
+	    break;
+	 case 3:
+            draw.setColor(faintBlue);
+            draw.fillBox(.7,.5,.2,.1);
+	    double dx = 1*.2, dy = 2*.2;
+	    show(.3+dx,+dy,.5+dx,dy,.3+dx,.2+dy);
+	    break;
+	 case 4:
+            draw.setColor(faintBlue);
+            draw.fillBox(.2,.2,.1,.2);
+	    show(.3,0,.3,.2,.1,0);
+	    break;
+         }
+      }
+   }
+
+   Color green = new Color(0,200,0);
+   Color faintBlue = new Color(0,0,255,32);
+
+   void drawValue(String[] values, int i, int j, double x, double y) {
+      if (show > 0)
+         draw.setColor(i==0?Color.red:i==1?green:Color.blue);
+      draw.drawText(values[i+3*j], x + .04, y - .04);
+      draw.setColor(Color.black);
+   }
+
+   void show(double ax,double ay,double bx,double by,double cx,double cy) {
+      draw.setColor(Color.red);
+      draw.fillArrow(ax,ay,bx,by,.03);
+      draw.setColor(green);
+      draw.fillArrow(ax,ay,cx,cy,.03);
+      draw.setColor(Color.blue);
+      draw.fillDisk (ax,ay,.06);
+      draw.setColor(lightBlue);
+   }
+</figure><b></b>
+
+
+
+
+
+
+
+
+
+
+
+

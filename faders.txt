@@ -1,0 +1,49 @@
+
+<figure name=faders>
+<button mode=0> A | B | C | D | E | F | G | H </button>
+   w = 1. / 8;
+   slotColor = new Color(70,70,70);
+   panelColor = new Color(210,210,210);
+   tileColor = new Color(240,240,240);
+   draw() {
+      draw.setColor(panelColor);
+      draw.fillRect(0, 0, width, height);
+      draw.setColor(Color.black);
+      draw.drawRect(0,0,width-1,height-1);
+      for (int n = 0 ; n < 8 ; n++) {
+         x = (2. * n - (8-1)) / (8-1);
+         y = (2 * mode(n) - 1) * .8;
+	 drawBox(slotColor, x, 0, w/3, .9, .03);
+	 drawBox(tileColor, x, y, w, w, .03);
+         draw.drawText("ABCDEFGH".substring(n,n+1),x,y);
+      }
+   }
+   drawBox(color, x, y, w, h, b) {
+      draw.setColor(color);
+      draw.fillBox(x, y, w, h, b);
+      draw.setColor(Color.black);
+      draw.drawBox(x, y, w, h, b);
+   }
+</figure>
+
+<figure name=curves>
+   xdraw() {
+      s = 2.0;
+      for (double t = 0.0 ; t < 1.0 ; t += 0.001)  {
+         x = t - .5;
+
+	 y = t;
+         draw.setColor(Color.black);
+         draw.fillDisk(s * x, s * (y - .5), 0.01);
+
+	 c = y * y * (3 - y - y);
+         draw.setColor(Color.blue);
+         draw.fillDisk(s * x, s * (c - .5), 0.01);
+
+	 c = .5 - .5 * Math.cos(y * Math.PI);
+         draw.setColor(Color.red);
+         draw.fillDisk(s * x, s * (c - .5), 0.01);
+      }
+   }
+</figure>
+

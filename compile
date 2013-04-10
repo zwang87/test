@@ -1,0 +1,13 @@
+
+# a compile script for TestDoc
+
+mkdir -p build/classes
+javac -d build/classes TestDoc.java -classpath build/classes:libs/bsh-core-n-classpath-2.1b5.jar -sourcepath . 
+
+mkdir -p build/jar_temp
+cd build/jar_temp/
+jar xf ../../libs/bsh-core-n-classpath-2.1b5.jar bsh/
+cd ../../
+
+mkdir -p build/jar
+jar cf build/jar/bean9e.jar -C build/classes/ . -C build/jar_temp .

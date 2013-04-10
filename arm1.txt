@@ -1,0 +1,72 @@
+
+<include>
+   void printMessage() {
+      System.err.println("this is my message");
+   }
+</include>
+
+<figure>
+<slider sRot=0.0> shoulder </slider>
+<slider eRot=0.0> elbow </slider>
+<slider wRot=0.5> wrist </slider>
+   Geometry shoulder, elbow, wrist;
+   Geometry upperarm, forearm, hand;
+
+   mouseMove(x, y) { }
+   mousePress(x, y) { }
+   mouseDrag(x, y) { }
+   mouseRelease(x, y) { }
+
+   setup() {
+      render.addLight( 1, 1, 1, 1, 1, 1);
+      render.addLight(-1,-1,-1, 1, 1, 1);
+      render.setFOV(0.5);
+
+      material = new Material();
+      material.setAmbient(.2,.12,.12);
+      material.setDiffuse(1,.6,.6);
+
+      arm = render.getWorld().add();
+      arm.setMaterial(material);
+
+      shoulder = arm.add();
+      elbow = shoulder.add();
+      wrist = elbow.add();
+
+      upperarm = shoulder.add().sphere(8);
+      matrix = upperarm.getMatrix();
+      matrix.identity();
+      matrix.translate(.5,0,0);
+      matrix.scale(.5,.1,.1);
+
+      lowerarm = elbow.add().sphere(8);
+      matrix = lowerarm.getMatrix();
+      matrix.identity();
+      matrix.translate(.5,0,0);
+      matrix.scale(.5,.1,.1);
+
+      hand = wrist.add().sphere(8);
+      matrix = hand.getMatrix();
+      matrix.identity();
+      matrix.translate(.2,0,0);
+      matrix.scale(.2,.1,.1);
+   }
+
+   update() {
+
+      matrix = shoulder.getMatrix();
+      matrix.identity();
+      matrix.rotateZ(Math.PI / 2 * (sRot - 1));
+
+      matrix = elbow.getMatrix();
+      matrix.identity();
+      matrix.translate(1, 0, 0);
+      matrix.rotateZ(Math.PI / 2 * eRot);
+
+      matrix = wrist.getMatrix();
+      matrix.identity();
+      matrix.translate(1, 0, 0);
+      matrix.rotateZ(Math.PI / 2 * (wRot - 0.5));
+
+   }
+</figure>

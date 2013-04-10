@@ -1,0 +1,1 @@
+java textToCode <"$1" >Code.java

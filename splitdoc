@@ -1,0 +1,33 @@
+#!/bin/sh
+
+# clean build dir
+rm -r build
+
+# compile
+mkdir -p build/classes
+javac -d build/classes TestSplitDoc.java -classpath build/classes:libs/bsh-core-n-classpath-2.1b5.jar -sourcepath . 
+
+mkdir -p build/jar_temp
+cd build/jar_temp/
+jar xf ../../libs/bsh-core-n-classpath-2.1b5.jar bsh/
+cd ../../
+
+mkdir -p build/jar
+jar cf build/jar/bean9e.jar -C build/classes/ . -C build/jar_temp .
+
+# generate test HTML
+
+cat >testsplitdoc.html <<HERE
+<body bgcolor=black>
+<center>
+
+<applet codebase="build/jar" code="TestSplitDoc.class" archive="bean9e.jar" width=640 height=700>
+<param name="file" value="$1"/>
+</applet>
+
+</center>
+</body>
+HERE
+
+# run appletviewer
+appletviewer -J-Xmx1024M -J-Djava.security.policy=test/openPolicy.sec testsplitdoc.html

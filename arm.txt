@@ -1,0 +1,77 @@
+
+This is my cool example arm:
+<figure aspect=1.0>
+<slider sFwd=0> shoulder fwd </slider>
+<slider sUp=0> shoulder up </slider>
+<slider eRot=0> elbow rot </slider>
+<slider eUp=0> elbow </slider>
+<slider wRot=.5> wrist </slider>
+   Geometry arm, shoulder, elbow, wrist;
+   Geometry upperarm, lowerarm, hand;
+
+   Geometry elbowJoint;
+
+   setup() {
+      render.addLight( 1, 1, 1, 1, 1, 1);
+      render.addLight(-1,-1,-1, 1, 1, 1);
+      render.setFOV(0.5);
+
+      Material material = new Material();
+      material.setDiffuse(1, .6, .6);
+      material.setAmbient(.2, .12, .12);
+
+      arm = render.getWorld().add();
+
+      arm.setMaterial(material);
+
+      shoulder = arm.add();
+      elbow = shoulder.add();
+      wrist = elbow.add();
+
+      //elbowJoint = elbow.add().cube();
+   }
+
+   update() {
+
+      upperarm = shoulder.add().sphere(8);
+      matrix = upperarm.getMatrix();
+      matrix.identity();
+      matrix.translate(0.5, 0, 0);
+      matrix.scale(0.5, 0.1 + .05*eUp, 0.1 + .05*eUp);
+
+      lowerarm = elbow.add().sphere(8);
+      matrix = lowerarm.getMatrix();
+      matrix.identity();
+      matrix.translate(0.5, 0, 0);
+      matrix.scale(0.5, 0.1, 0.1);
+
+      hand = wrist.add().sphere(8);
+      matrix = hand.getMatrix();
+      matrix.identity();
+      matrix.translate(0.2, 0, 0);
+      matrix.scale(0.2, 0.1, 0.1);
+
+      matrix = shoulder.getMatrix();
+      matrix.identity();
+      matrix.rotateY(-sFwd);
+      matrix.rotateZ(sUp);
+
+      matrix = elbow.getMatrix();
+      matrix.identity();
+      matrix.translate(1.0, 0, 0);
+      matrix.rotateX(eRot);
+      matrix.rotateZ(2 * eUp);
+
+      matrix = wrist.getMatrix();
+      matrix.identity();
+      matrix.translate(1.0, 0, 0);
+      matrix.rotateZ(2 * wRot - 1);
+
+      //matrix = elbowJoint.getMatrix();
+      //matrix.identity();
+      //matrix.translate(Math.sin(time),0,0);
+      //matrix.scale(.2);
+   }
+   
+</figure>
+

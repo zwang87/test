@@ -1,0 +1,15 @@
+#!/bin/sh
+
+cat >testshareddoc.html <<HERE
+<body bgcolor=black>
+<center>
+
+<applet codebase="build/jar" code="TestSharedDoc.class" archive="bean9e.jar" width=640 height=700>
+<param name="$1"/>
+</applet>
+
+</center>
+</body>
+HERE
+
+appletviewer -J-Xmx1024M -J-Djava.security.policy=test/openPolicy.sec testshareddoc.html
