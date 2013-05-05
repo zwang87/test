@@ -68,6 +68,7 @@ public class PadClient implements DocSync.ChangeWatcherClient
       this.selectionStart = selectionStart;
       this.selectionEnd = selectionEnd;
       this.isVaryingNumber = isVaryingNumber;
+       
        //wz
        if (pad != null) {
            try {

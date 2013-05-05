@@ -556,7 +556,7 @@ public class Doc extends BlockRegion implements Types
       public boolean mousePress(int x, int y) {
          if (anchorId < 0)
             return super.mousePress(x, y);
-         return true;
+          return true;
       }
 
       public void mouseDrag(int x, int y) {
@@ -633,7 +633,7 @@ public class Doc extends BlockRegion implements Types
            *///if(caretStartList.length > 0){
           if(caretStartList != null){
             for(int i = 0; i < caretStartList.length; i++){
-                  if(i != tempPos){
+                  if(i != curCaretPos){
                   nextSelectionColor = selectionColor;
                   if (caretStartList[i] < iHi && caretEndList[i] > iLo) {
                       int i0 = Math.max(iLo, caretStartList[i]);
@@ -1944,12 +1944,13 @@ public class Doc extends BlockRegion implements Types
                       if(colorList[m] != null){
                           g.setColor(colorList[m]);
                           g.fillRect(findCaretX(tr2, caretEndList[m]), tr2.gy, 1, lineHeight);
-                          if(userIdList[m] !=  null){
-                              g.drawString(userIdList[m], findCaretX(tr2, caretEndList[m]), tr2.gy + 5);
-                          }
+                          //print userId
+                          //if(userIdList[m] !=  null){
+                          //    g.drawString(userIdList[m], findCaretX(tr2, caretEndList[m]), tr2.gy + 5);
+                          //}
                       }
                       else{
-                          tempPos = m;
+                          curCaretPos = m;
                       }
                   }
               }
@@ -1957,7 +1958,6 @@ public class Doc extends BlockRegion implements Types
           ///wz
    }
     
-    int tempPos = -1;
     //wz
     public void updateCaretList(int[] caretStartInfo, int[] caretEndInfo, String[] colorInfo, String[] userIdInfo){
         caretStartList = null;
@@ -2099,14 +2099,14 @@ public class Doc extends BlockRegion implements Types
          drawing().startLine(x, y);
          return true;
       }
-
+       
       int i = caretAtPosition(x, y);
 
       if (isVaryingNumber && (tr != null || selectionStart <= i && selectionEnd > i)) {
          mx = x;
          return true;
       }
-
+       
       isVaryingNumber = false;
       setCaret(i);
       caretAtMousePress = caret;
@@ -2147,6 +2147,7 @@ public class Doc extends BlockRegion implements Types
          return;
       }
       setCaretToPosition(x, y);
+       
       setSelection(Math.min(caret, caretAtMousePress),
                    Math.max(caret, caretAtMousePress));
    }
@@ -2156,7 +2157,6 @@ public class Doc extends BlockRegion implements Types
          drawing().endLine(x, y);
          return;
       }
-
       isVaryingNumber = false;
       tr = null;
    }
@@ -2169,7 +2169,6 @@ public class Doc extends BlockRegion implements Types
       if (currentTime - clickTime > 500)
          clickCount = 0;
       clickTime = currentTime;
-
       switch (++clickCount) {
       case 1: break;
       case 2: selectWord(); break;
@@ -2808,6 +2807,7 @@ public class Doc extends BlockRegion implements Types
     
     //wz
     int listSize = 0;
+    int curCaretPos = -1;
     int[] caretStartList;
     int[] caretEndList;
     Color[] colorList;
